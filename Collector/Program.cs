@@ -11,7 +11,7 @@ namespace Collector
             string RootFolder = ""; // Корневая папка для обработки
             string OutputFile = @"output.csv"; // Имя выходного файла
 
-            Console.WriteLine("Collector v1.01 has started.");
+            Console.WriteLine("Collector v1.02 has started.");
             // Разбор параметров
             Console.WriteLine("Параметры:");
             foreach(string arg in args)
@@ -79,7 +79,18 @@ namespace Collector
                 Environment.Exit(2);
             }
             // Создание выходного файла
-
+            try
+            {
+                if (OutputFile.IndexOf(Path.DirectorySeparatorChar) == -1)
+                {
+                    //OutputPath = RootFolder
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Environment.Exit(3);
+            }
             // Получить список подкаталогов
             List<string> dirs = new List<string>(Directory.EnumerateDirectories(RootFolder));
             // Перебираем подкаталоги
