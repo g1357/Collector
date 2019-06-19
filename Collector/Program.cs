@@ -2,21 +2,42 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 
 namespace Collector
 {
     class Program
     {
+        public struct MyData
+        {
+            public string BuildName;
+            public string MaterialValue;
+            public string SupportMaterial;
+            public string BuildTime;
+            public string Modeler;
+            public string MaterialType;
+            public string SliceHeight;
+        }
         static void Main(string[] args)
         {
             string RootFolder = ""; // Корневая папка для обработки
             string OutputFile = @"output.csv"; // Имя выходного файла
             string OutputPath; // Путь выходного файла
+            StreamWriter OutputStream = null; // Поток выходного файла
+            MyData Data; // Собранные даты
 
-            Debug.WriteLine("Collector v1.02 has started.");
+            Debug.WriteLine("Collector started.");
+
+            Assembly Ass = typeof(Program).Assembly;
+            AssemblyName AssName = Ass.GetName();
+            string Version = AssName.Version.ToString();
+            string Name = AssName.Name;
+            Debug.WriteLine($"Name: {Name}");
+            Debug.WriteLine($"Version: {Version}");
+
             // Разбор параметров
             Debug.WriteLine("Параметры:");
-            foreach(string arg in args)
+            foreach (string arg in args)
             {
                 Debug.WriteLine(arg);
             }
@@ -38,7 +59,7 @@ namespace Collector
                     case "-info":
                     case "-i":
                         // Вывод информации о программе
-                        Console.WriteLine("Collector v.1.02 от 19.06.2019");
+                        Console.WriteLine($"{Name} Ver.{Version} от 19.06.2019");
                         Console.WriteLine("(c) E+E.SU (www.epe.su)");
                         break;
 
@@ -98,7 +119,7 @@ namespace Collector
             }
 
             // Разбор аргументов закончен
-            Debug.WriteLine($"Корневой каталог: {RootFolder}"); 
+            Debug.WriteLine($"Корневой каталог: {RootFolder}");
             Debug.WriteLine($"Выходной файл: {OutputFile}");
 
             // Проверка существвания каталога
@@ -112,7 +133,7 @@ namespace Collector
             {
                 if (OutputFile.IndexOf(Path.DirectorySeparatorChar) == -1)
                 {
-                    if (RootFolder[RootFolder.Length-1] == Path.DirectorySeparatorChar)
+                    if (RootFolder[RootFolder.Length - 1] == Path.DirectorySeparatorChar)
                     {
                         OutputPath = RootFolder + OutputFile;
                     }
@@ -126,12 +147,28 @@ namespace Collector
                     OutputPath = OutputFile;
                 }
                 Debug.WriteLine($"Путь выходного файла: {OutputPath}");
+
+                bool FileExist = File.Exists(OutputPath);
+                try
+                {
+                    OutputStream = File.AppendText(OutputPath);
+                    if (!FileExist)
+                    { // Вывести шапку таблицы
+                        OutputStream.WriteLine("Build name,Model material value,Support material,Est.build time,Printer (Modeler), Material type, Slice height");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    Environment.Exit(4);
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Environment.Exit(4);
+                Environment.Exit(5);
             }
+
             // Получить список подкаталогов
             List<string> dirs = new List<string>(Directory.EnumerateDirectories(RootFolder));
             // Перебираем подкаталоги
@@ -145,11 +182,34 @@ namespace Collector
                 {
                     Debug.Write($"{currentFile.Substring(currentFile.LastIndexOf(Path.DirectorySeparatorChar) + 1)} - ");
                     Debug.WriteLine($"{currentFile}");
-                }
+                    Data = new MyData();
+                    Data.BuildName = dir.Substring(dir.LastIndexOf(Path.DirectorySeparatorChar) + 1);
+                    GetData(currentFile, ref Data);
+                    try
+                    {
+                        OutputStream.WriteLine($"{Data.BuildName},{Data.MaterialValue},{Data.SupportMaterial},"
+                            + $"{Data.BuildTime},{Data.Modeler},{Data.MaterialType},{Data.SliceHeight}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        Environment.Exit(6);
+                    }
 
+                }
+            }
+
+            if (OutputStream != null)
+            {
+                OutputStream.Close();
+                OutputStream.Dispose();
             }
 
             Debug.WriteLine("Collector ends its work.");
+        }
+        static void GetData(string FilePath, ref MyData Data)
+        {
+
         }
     }
 }

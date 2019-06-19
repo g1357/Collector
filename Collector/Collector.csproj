@@ -3,7 +3,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <Version>1.01.0</Version>
+    <Version>1.0.3.2</Version>
+    <Authors>GBD</Authors>
+    <Company>E+E.SU</Company>
+    <Copyright>E+E.SU</Copyright>
+    <PackageProjectUrl>www.epe.su/products/collector</PackageProjectUrl>
   </PropertyGroup>
 
 </Project>
