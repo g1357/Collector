@@ -20,6 +20,8 @@ namespace Collector
         }
         static void Main(string[] args)
         {
+            const string RevDate = "19.06.2019"; // Дата редакции
+
             string RootFolder = ""; // Корневая папка для обработки
             string OutputFile = @"output.csv"; // Имя выходного файла
             string OutputPath; // Путь выходного файла
@@ -59,7 +61,7 @@ namespace Collector
                     case "-info":
                     case "-i":
                         // Вывод информации о программе
-                        Console.WriteLine($"{Name} Ver.{Version} от 19.06.2019");
+                        Console.WriteLine($"{Name} Ver.{Version} от {RevDate}");
                         Console.WriteLine("(c) E+E.SU (www.epe.su)");
                         break;
 
