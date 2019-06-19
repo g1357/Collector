@@ -1,13 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <Version>1.0.5.0</Version>
     <Authors>GBD</Authors>
     <Company>E+E.SU</Company>
     <Copyright>E+E.SU</Copyright>
     <PackageProjectUrl>www.epe.su/products/collector</PackageProjectUrl>
+    <StartupObject>Collector.Program</StartupObject>
+    <ApplicationIcon />
   </PropertyGroup>
 
 </Project>
