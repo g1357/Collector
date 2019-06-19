@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace Collector
@@ -10,50 +11,45 @@ namespace Collector
         {
             string RootFolder = ""; // Корневая папка для обработки
             string OutputFile = @"output.csv"; // Имя выходного файла
+            string OutputPath; // Путь выходного файла
 
-            Console.WriteLine("Collector v1.02 has started.");
+            Debug.WriteLine("Collector v1.02 has started.");
             // Разбор параметров
-            Console.WriteLine("Параметры:");
+            Debug.WriteLine("Параметры:");
             foreach(string arg in args)
             {
-                Console.WriteLine(arg);
+                Debug.WriteLine(arg);
             }
             var qty = args.Length; // Количество аргументов
             if (qty > 0)
             {
                 var arg1 = args[0].Trim();
-                if (arg1 == "-help" && arg1 == "-h")
-                { // Запрос выводв подсказки
-                    Console.WriteLine("Запуск: Collector -help  или Collector -h для получения помощи.");
-                    Console.WriteLine("Запуск: Collector [<корневая папка>] [-out <выходной файл>]");
-                }
-                else if (arg1 == "-out")
-                { // Корневая папка не задана (берём текущую), задан выходной файл
-                    RootFolder = Directory.GetCurrentDirectory();
-                    if (qty > 1)
-                    {
-                        OutputFile = args[1];
-                        if ( OutputFile.IndexOf('.') == -1)
-                        {
-                            OutputFile += ".csv";
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("ОШИБКА: Не задан выходной файл!");
-                        Environment.Exit(1);
-                    }
-                }
-                RootFolder = arg1;
-
-                if (qty > 1)
+                switch (arg1)
                 {
-                    var arg2 = args[1];
-                    if (arg2 == "-out")
-                    { // Задан выходной файл
-                        if (qty > 2)
+                    case "-help":
+                    case "-h":
+                        // Вывод подсказки
+                        Console.WriteLine("Запуск:");
+                        Console.WriteLine("\t Collector -help  или Collector -h для получения помощи.");
+                        Console.WriteLine("\t Collector -info  или Collector -i для получения информации о программе.");
+                        Console.WriteLine("\t Collector [<корневая папка>] [-out <выходной файл>]");
+                        break;
+
+                    case "-info":
+                    case "-i":
+                        // Вывод информации о программе
+                        Console.WriteLine("Collector v.1.02 от 19.06.2019");
+                        Console.WriteLine("(c) E+E.SU (www.epe.su)");
+                        break;
+
+                    case "-out":
+                    case "-o":
+                        // Задан выходной файл
+                        // Корневая папка не задана (берём текущую), задан выходной файл
+                        RootFolder = Directory.GetCurrentDirectory();
+                        if (qty > 1)
                         {
-                            OutputFile = args[2];
+                            OutputFile = args[1];
                             if (OutputFile.IndexOf('.') == -1)
                             {
                                 OutputFile += ".csv";
@@ -64,49 +60,96 @@ namespace Collector
                             Console.WriteLine("ОШИБКА: Не задан выходной файл!");
                             Environment.Exit(1);
                         }
-                    }
+                        break;
+
+                    default:
+                        RootFolder = arg1;
+                        if (qty > 1)
+                        {
+                            var arg2 = args[1];
+                            switch (arg2)
+                            {
+                                case "-out":
+                                case "-o":
+                                    // Задан выходной файл
+                                    if (qty > 2)
+                                    {
+                                        OutputFile = args[2];
+                                        if (OutputFile.IndexOf('.') == -1)
+                                        {
+                                            OutputFile += ".csv";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("ОШИБКА: Не задан выходной файл!");
+                                        Environment.Exit(1);
+                                    }
+                                    break;
+
+                                default:
+                                    Console.WriteLine("ОШИБКА: Не правильный формат команды!");
+                                    Environment.Exit(2);
+                                    break;
+                            }
+                        }
+                        break;
                 }
             }
 
             // Разбор аргументов закончен
-            Console.WriteLine($"Корневой каталог: {RootFolder}"); 
-            Console.WriteLine($"Выходной файл: {OutputFile}");
+            Debug.WriteLine($"Корневой каталог: {RootFolder}"); 
+            Debug.WriteLine($"Выходной файл: {OutputFile}");
 
             // Проверка существвания каталога
             if (!Directory.Exists(RootFolder))
             {
                 Console.WriteLine("ОШИБКА: Корневой каталог не существует или задан не правильно!");
-                Environment.Exit(2);
+                Environment.Exit(3);
             }
             // Создание выходного файла
             try
             {
                 if (OutputFile.IndexOf(Path.DirectorySeparatorChar) == -1)
                 {
-                    //OutputPath = RootFolder
+                    if (RootFolder[RootFolder.Length-1] == Path.DirectorySeparatorChar)
+                    {
+                        OutputPath = RootFolder + OutputFile;
+                    }
+                    else
+                    {
+                        OutputPath = RootFolder + Path.DirectorySeparatorChar + OutputFile;
+                    }
                 }
+                else
+                {
+                    OutputPath = OutputFile;
+                }
+                Debug.WriteLine($"Путь выходного файла: {OutputPath}");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Environment.Exit(3);
+                Environment.Exit(4);
             }
             // Получить список подкаталогов
             List<string> dirs = new List<string>(Directory.EnumerateDirectories(RootFolder));
             // Перебираем подкаталоги
             foreach (var dir in dirs)
             {
-                Console.WriteLine($"{dir.Substring(dir.LastIndexOf(Path.DirectorySeparatorChar) + 1)}");
+                Debug.Write($"{dir.Substring(dir.LastIndexOf(Path.DirectorySeparatorChar) + 1)} - ");
+                Debug.WriteLine($"{dir}");
                 var txtFiles = Directory.EnumerateFiles(dir, "log.txt");
 
                 foreach (string currentFile in txtFiles)
                 {
-                    Console.WriteLine($"{currentFile.Substring(currentFile.LastIndexOf(Path.DirectorySeparatorChar) + 1)}");
+                    Debug.Write($"{currentFile.Substring(currentFile.LastIndexOf(Path.DirectorySeparatorChar) + 1)} - ");
+                    Debug.WriteLine($"{currentFile}");
                 }
 
             }
 
-            Console.WriteLine("Collector ends its work.");
+            Debug.WriteLine("Collector ends its work.");
         }
     }
 }
