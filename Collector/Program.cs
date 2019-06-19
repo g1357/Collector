@@ -235,7 +235,7 @@ namespace Collector
                     int.TryParse(strValue.Substring(0, strValue.IndexOf("hr")).Trim(), out Hours);
                     Pos = strValue.IndexOf("hr") + 3;
                     int.TryParse(strValue.Substring(Pos, strValue.IndexOf("min") - Pos - 1).Trim(), out Minutes);
-                    Data.BuildTime = string.Format($"{Hours:D2}:{Minutes:D2}");
+                    Data.BuildTime = string.Format("{0,2:D2}:{1,2:D2}", Hours, Minutes);
                     Debug.WriteLine($"[{Data.BuildTime}]");
                 }
                 else if (line.Contains("Model material:"))
