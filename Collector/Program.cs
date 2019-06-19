@@ -56,6 +56,7 @@ namespace Collector
                         Console.WriteLine("\t Collector -help  или Collector -h для получения помощи.");
                         Console.WriteLine("\t Collector -info  или Collector -i для получения информации о программе.");
                         Console.WriteLine("\t Collector [<корневая папка>] [-out <выходной файл>]");
+                        Environment.Exit(0);
                         break;
 
                     case "-info":
@@ -63,6 +64,7 @@ namespace Collector
                         // Вывод информации о программе
                         Console.WriteLine($"{Name} Ver.{Version} от {RevDate}");
                         Console.WriteLine("(c) E+E.SU (www.epe.su)");
+                        Environment.Exit(0);
                         break;
 
                     case "-out":
@@ -80,8 +82,7 @@ namespace Collector
                         }
                         else
                         {
-                            Console.WriteLine("ОШИБКА: Не задан выходной файл!");
-                            Environment.Exit(1);
+                            AbortProg("ОШИБКА #1: Не задан выходной файл!", 1);
                         }
                         break;
 
@@ -105,19 +106,21 @@ namespace Collector
                                     }
                                     else
                                     {
-                                        Console.WriteLine("ОШИБКА: Не задан выходной файл!");
-                                        Environment.Exit(1);
+                                        AbortProg("ОШИБКА #2: Не задан выходной файл!", 2);
                                     }
                                     break;
 
                                 default:
-                                    Console.WriteLine("ОШИБКА: Не правильный формат команды!");
-                                    Environment.Exit(2);
+                                    AbortProg("ОШИБКА #3: Не правильный формат команды!", 3);
                                     break;
                             }
                         }
                         break;
                 }
+            }
+            else
+            { // Аргументы не заданы
+                RootFolder = Directory.GetCurrentDirectory();
             }
 
             // Разбор аргументов закончен
@@ -127,8 +130,7 @@ namespace Collector
             // Проверка существвания каталога
             if (!Directory.Exists(RootFolder))
             {
-                Console.WriteLine("ОШИБКА: Корневой каталог не существует или задан не правильно!");
-                Environment.Exit(3);
+                AbortProg("ОШИБКА #4: Корневой каталог не существует или задан не правильно!", 4);
             }
             // Создание выходного файла
             try
@@ -161,14 +163,12 @@ namespace Collector
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
-                    Environment.Exit(4);
+                    AbortProg("ОШИБКА №5: " + ex.Message, 5);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                Environment.Exit(5);
+                AbortProg("ОШИБКА #6:" + ex.Message, 6);
             }
 
             // Получить список подкаталогов
@@ -194,8 +194,7 @@ namespace Collector
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
-                        Environment.Exit(6);
+                        AbortProg("ОШИБКА #7:" + ex.Message, 7);
                     }
 
                 }
@@ -208,6 +207,10 @@ namespace Collector
             }
 
             Debug.WriteLine("Collector ends its work.");
+#if DEBUG
+            Console.WriteLine("Для завершение программы нажмите любой символ!");
+            Console.ReadKey();
+#endif
         }
         static void GetData(string FilePath, ref MyData Data)
         {
@@ -225,7 +228,7 @@ namespace Collector
                     Debug.WriteLine(line);
                     Pic = "\t";
                     Pos = line.LastIndexOf(Pic) + Pic.Length;
-                    Data.Modeler = line.Substring(Pos,line.IndexOf("}")-Pos).Trim();
+                    Data.Modeler = line.Substring(Pos, line.IndexOf("}") - Pos).Trim();
                     Debug.WriteLine($"[{Data.Modeler}]");
                 }
                 else if (line.Contains("Est. build time:"))
@@ -276,6 +279,16 @@ namespace Collector
                     Debug.WriteLine($"[{Data.SliceHeight}]");
                 }
             }
+        }
+
+        static void AbortProg(string Message, int ExitCode)
+        {
+            Console.WriteLine(Message);
+#if DEBUG
+                Console.WriteLine("Для завершение программы нажмите любой символ!");
+                Console.ReadKey();
+#endif
+            Environment.Exit(ExitCode);
         }
     }
 }

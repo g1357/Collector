@@ -2,7 +2,7 @@
   "profiles": {
     "Collector": {
       "commandName": "Project",
-      "commandLineArgs": "c:\\temp\\myData -out output"
+      "commandLineArgs": "c:\\temp\\myData"
     }
   }
 }
