@@ -209,7 +209,71 @@ namespace Collector
         }
         static void GetData(string FilePath, ref MyData Data)
         {
+            int Pos;
+            string Pic;
+            string strValue;
+            decimal decValue;
+            int Hours;
+            int Minutes;
 
+            foreach (string line in File.ReadLines(FilePath))
+            {
+                if (line.Contains("Modeler:"))
+                {
+                    Debug.WriteLine(line);
+                    Pic = "\t";
+                    Pos = line.LastIndexOf(Pic) + Pic.Length;
+                    Data.Modeler = line.Substring(Pos,line.IndexOf("}")-Pos).Trim();
+                    Debug.WriteLine($"[{Data.Modeler}]");
+                }
+                else if (line.Contains("Est. build time:"))
+                {
+                    Debug.WriteLine(line);
+                    Pic = "\t";
+                    Pos = line.LastIndexOf(Pic) + Pic.Length;
+                    strValue = line.Substring(Pos, line.IndexOf("}") - Pos).Trim().Trim();
+                    int.TryParse(strValue.Substring(0, strValue.IndexOf("hr")).Trim(), out Hours);
+                    Pos = strValue.IndexOf("hr") + 3;
+                    int.TryParse(strValue.Substring(Pos, strValue.IndexOf("min") - Pos - 1).Trim(), out Minutes);
+                    Data.BuildTime = string.Format($"{Hours:D2}:{Minutes:D2}");
+                    Debug.WriteLine($"[{Data.BuildTime}]");
+                }
+                else if (line.Contains("Model material:"))
+                {
+                    Debug.WriteLine(line);
+                    Pic = "Model material:";
+                    Pos = line.LastIndexOf(Pic) + Pic.Length;
+                    strValue = line.Substring(Pos, line.IndexOf("cm") - Pos).Trim();
+                    decimal.TryParse(strValue, out decValue);
+                    decValue = Math.Round(decValue + 0.005m, 2);
+                    Data.MaterialValue = decValue.ToString();
+                    Debug.WriteLine($"[{Data.MaterialValue}]");
+
+                    Pic = "\t";
+                    Pos = line.LastIndexOf(Pic) + Pic.Length;
+                    Data.MaterialType = line.Substring(Pos, line.IndexOf("}") - Pos).Trim();
+                    Debug.WriteLine($"[{Data.MaterialType}]");
+                }
+                else if (line.Contains("Support material:"))
+                {
+                    Debug.WriteLine(line);
+                    Pic = "Support material:";
+                    Pos = line.LastIndexOf(Pic) + Pic.Length;
+                    strValue = line.Substring(Pos, line.IndexOf("cm") - Pos).Trim();
+                    decimal.TryParse(strValue, out decValue);
+                    decValue = Math.Round(decValue + 0.005m, 2);
+                    Data.SupportMaterial = decValue.ToString();
+                    Debug.WriteLine($"[{Data.SupportMaterial}]");
+                }
+                else if (line.Contains("Slice height:"))
+                {
+                    Debug.WriteLine(line);
+                    Pic = "\t";
+                    Pos = line.LastIndexOf(Pic) + Pic.Length;
+                    Data.SliceHeight = line.Substring(Pos, line.IndexOf("}") - Pos).Trim();
+                    Debug.WriteLine($"[{Data.SliceHeight}]");
+                }
+            }
         }
     }
 }
