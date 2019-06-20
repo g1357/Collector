@@ -23,7 +23,7 @@ namespace Collector_WinConApp
         }
         static void Main(string[] args)
         {
-            const string RevDate = "19.06.2019"; // Дата редакции
+            const string RevDate = "20.06.2019"; // Дата редакции
 
             string RootFolder = ""; // Корневая папка для обработки
             string OutputFile = @"output.csv"; // Имя выходного файла
@@ -240,9 +240,17 @@ namespace Collector_WinConApp
                     Pic = "\t";
                     Pos = line.LastIndexOf(Pic) + Pic.Length;
                     strValue = line.Substring(Pos, line.IndexOf("}") - Pos).Trim().Trim();
-                    int.TryParse(strValue.Substring(0, strValue.IndexOf("hr")).Trim(), out Hours);
-                    Pos = strValue.IndexOf("hr") + 3;
-                    int.TryParse(strValue.Substring(Pos, strValue.IndexOf("min") - Pos - 1).Trim(), out Minutes);
+                    if (strValue.Contains("hr"))
+                    { // Формат времени"xx hr xx min"
+                        int.TryParse(strValue.Substring(0, strValue.IndexOf("hr")).Trim(), out Hours);
+                        Pos = strValue.IndexOf("hr") + 3;
+                        int.TryParse(strValue.Substring(Pos, strValue.IndexOf("min") - Pos - 1).Trim(), out Minutes);
+                    }
+                    else
+                    { // Формат времени"xx min"
+                        Hours = 0;
+                        int.TryParse(strValue.Substring(0, strValue.IndexOf("min") - 1).Trim(), out Minutes);
+                    }
                     Data.BuildTime = string.Format("{0,2:D2}:{1,2:D2}", Hours, Minutes);
                     Debug.WriteLine($"[{Data.BuildTime}]");
                 }
