@@ -161,7 +161,8 @@ namespace Collector_WinConApp
                     OutputStream = File.AppendText(OutputPath);
                     if (!FileExist)
                     { // Вывести шапку таблицы
-                        OutputStream.WriteLine("Build name,Model material value,Support material,Est.build time,Printer (Modeler), Material type, Slice height");
+                        //OutputStream.WriteLine("Build name,Model material value,Support material,Est.build time,Printer (Modeler), Material type, Slice height");
+                        OutputStream.WriteLine("Build name;Model material value;Support material;Est.build time;Printer (Modeler);Material type;Slice height");
                     }
                 }
                 catch (Exception ex)
@@ -192,8 +193,8 @@ namespace Collector_WinConApp
                     GetData(currentFile, ref Data);
                     try
                     {
-                        OutputStream.WriteLine($"{Data.BuildName},{Data.MaterialValue},{Data.SupportMaterial},"
-                            + $"{Data.BuildTime},{Data.Modeler},{Data.MaterialType},{Data.SliceHeight}");
+                        OutputStream.WriteLine($"{Data.BuildName};{Data.MaterialValue};{Data.SupportMaterial};"
+                            + $"{Data.BuildTime};{Data.Modeler};{Data.MaterialType};{Data.SliceHeight}");
                     }
                     catch (Exception ex)
                     {
