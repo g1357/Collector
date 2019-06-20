@@ -224,6 +224,8 @@ namespace Collector_WinConApp
             int Hours;
             int Minutes;
 
+            Data.MaterialType = "";
+
             foreach (string line in File.ReadLines(FilePath))
             {
                 if (line.Contains("Modeler:"))
@@ -264,11 +266,13 @@ namespace Collector_WinConApp
                     decValue = Math.Round(decValue + 0.005m, 2);
                     Data.MaterialValue = decValue.ToString();
                     Debug.WriteLine($"[{Data.MaterialValue}]");
-
-                    Pic = "\t";
-                    Pos = line.LastIndexOf(Pic) + Pic.Length;
-                    Data.MaterialType = line.Substring(Pos, line.IndexOf("}") - Pos).Trim();
-                    Debug.WriteLine($"[{Data.MaterialType}]");
+                    if (line.Contains(","))
+                    {
+                        Pic = "\t";
+                        Pos = line.LastIndexOf(Pic) + Pic.Length;
+                        Data.MaterialType = line.Substring(Pos, line.IndexOf("}") - Pos).Trim();
+                        Debug.WriteLine($"[{Data.MaterialType}]");
+                    }
                 }
                 else if (line.Contains("Support material:"))
                 {
