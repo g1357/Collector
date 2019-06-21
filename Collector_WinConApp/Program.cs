@@ -23,13 +23,15 @@ namespace Collector_WinConApp
         }
         static void Main(string[] args)
         {
-            const string RevDate = "20.06.2019"; // Дата редакции
+            const string RevDate = "21.06.2019"; // Дата редакции
 
             string RootFolder = ""; // Корневая папка для обработки
             string OutputFile = @"output.csv"; // Имя выходного файла
             string OutputPath; // Путь выходного файла
             StreamWriter OutputStream = null; // Поток выходного файла
             MyData Data; // Собранные даты
+            // Разделитель элементов списка в зависимости от культуры
+            string LS = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator; ;
 
             Debug.WriteLine("Collector started.");
 
@@ -39,6 +41,7 @@ namespace Collector_WinConApp
             string Name = AssName.Name;
             Debug.WriteLine($"Name: {Name}");
             Debug.WriteLine($"Version: {Version}");
+            Debug.WriteLine($"List Separetor: '{LS}'");
 
             // Разбор параметров
             Debug.WriteLine("Параметры:");
@@ -161,8 +164,8 @@ namespace Collector_WinConApp
                     OutputStream = File.AppendText(OutputPath);
                     if (!FileExist)
                     { // Вывести шапку таблицы
-                        //OutputStream.WriteLine("Build name,Model material value,Support material,Est.build time,Printer (Modeler), Material type, Slice height");
-                        OutputStream.WriteLine("Build name;Model material value;Support material;Est.build time;Printer (Modeler);Material type;Slice height");
+                        OutputStream.WriteLine($"Build name{LS}Model material value{LS}Support material"
+                            + "{LS}Est.build time{LS}Printer (Modeler){LS}Material type{LS}Slice height");
                     }
                 }
                 catch (Exception ex)
@@ -193,8 +196,8 @@ namespace Collector_WinConApp
                     GetData(currentFile, ref Data);
                     try
                     {
-                        OutputStream.WriteLine($"{Data.BuildName};{Data.MaterialValue};{Data.SupportMaterial};"
-                            + $"{Data.BuildTime};{Data.Modeler};{Data.MaterialType};{Data.SliceHeight}");
+                        OutputStream.WriteLine($"{Data.BuildName}{LS}{Data.MaterialValue}{LS}{Data.SupportMaterial}{LS}"
+                            + $"{Data.BuildTime}{LS}{Data.Modeler}{LS}{Data.MaterialType}{LS}{Data.SliceHeight}");
                     }
                     catch (Exception ex)
                     {
