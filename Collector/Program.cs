@@ -20,7 +20,7 @@ namespace Collector
         }
         static void Main(string[] args)
         {
-            const string RevDate = "19.06.2019"; // Дата редакции
+            const string RevDate = "09.02.2020"; // Дата редакции
 
             string RootFolder = ""; // Корневая папка для обработки
             string OutputFile = @"output.csv"; // Имя выходного файла

@@ -23,7 +23,7 @@ namespace Collector_WinConApp
         }
         static void Main(string[] args)
         {
-            const string RevDate = "21.06.2019"; // Дата редакции
+            const string RevDate = "09.02.2020"; // Дата редакции
 
             string RootFolder = ""; // Корневая папка для обработки
             string OutputFile = @"output.csv"; // Имя выходного файла
@@ -165,7 +165,7 @@ namespace Collector_WinConApp
                     if (!FileExist)
                     { // Вывести шапку таблицы
                         OutputStream.WriteLine($"Build name{LS}Model material value{LS}Support material"
-                            + "{LS}Est.build time{LS}Printer (Modeler){LS}Material type{LS}Slice height");
+                            + $"{LS}Est.build time{LS}Printer (Modeler){LS}Material type{LS}Slice height");
                     }
                 }
                 catch (Exception ex)
