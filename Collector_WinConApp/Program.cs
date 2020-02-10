@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -23,7 +24,7 @@ namespace Collector_WinConApp
         }
         static void Main(string[] args)
         {
-            const string RevDate = "09.02.2020"; // Дата редакции
+            const string RevDate = "10.02.2020"; // Дата редакции
 
             string RootFolder = ""; // Корневая папка для обработки
             string OutputFile = @"output.csv"; // Имя выходного файла
@@ -31,7 +32,7 @@ namespace Collector_WinConApp
             StreamWriter OutputStream = null; // Поток выходного файла
             MyData Data; // Собранные даты
             // Разделитель элементов списка в зависимости от культуры
-            string LS = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator; ;
+            string LS = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator; 
 
             Debug.WriteLine("Collector started.");
 
@@ -227,6 +228,11 @@ namespace Collector_WinConApp
             decimal decValue;
             int Hours;
             int Minutes;
+            bool Result; // Результат разбора числа
+            // Формат числа , заданный на данном компьютере
+            NumberFormatInfo numberFormatInfo = CultureInfo.CurrentCulture.NumberFormat;
+            // Разделитель целой и дробной части
+            string decimalSeparator = numberFormatInfo.NumberDecimalSeparator;
 
             Data.MaterialType = "";
 
@@ -266,7 +272,13 @@ namespace Collector_WinConApp
                     Pic = "Model material:";
                     Pos = line.LastIndexOf(Pic) + Pic.Length;
                     strValue = line.Substring(Pos, line.IndexOf("cm") - Pos).Trim();
-                    decimal.TryParse(strValue, out decValue);
+                    Result = decimal.TryParse(strValue, out decValue);
+                    if (!Result)
+                    {
+                        NumberStyles style = NumberStyles.AllowDecimalPoint;
+                        CultureInfo culture = CultureInfo.CreateSpecificCulture("en-US");
+                        Result = decimal.TryParse(strValue, style, culture, out decValue);
+                    }
                     decValue = Math.Round(decValue + 0.005m, 2);
                     Data.MaterialValue = decValue.ToString();
                     Debug.WriteLine($"[{Data.MaterialValue}]");
@@ -284,17 +296,40 @@ namespace Collector_WinConApp
                     Pic = "Support material:";
                     Pos = line.LastIndexOf(Pic) + Pic.Length;
                     strValue = line.Substring(Pos, line.IndexOf("cm") - Pos).Trim();
-                    decimal.TryParse(strValue, out decValue);
+                    Result = decimal.TryParse(strValue, out decValue);
+                    if (!Result)
+                    {
+                        NumberStyles style = NumberStyles.AllowDecimalPoint;
+                        CultureInfo culture = CultureInfo.CreateSpecificCulture("en-US");
+                        Result = decimal.TryParse(strValue, style, culture, out decValue);
+                    }
                     decValue = Math.Round(decValue + 0.005m, 2);
                     Data.SupportMaterial = decValue.ToString();
                     Debug.WriteLine($"[{Data.SupportMaterial}]");
                 }
                 else if (line.Contains("Slice height:"))
                 {
+                    string value;
                     Debug.WriteLine(line);
                     Pic = "\t";
                     Pos = line.LastIndexOf(Pic) + Pic.Length;
-                    Data.SliceHeight = line.Substring(Pos, line.IndexOf("}") - Pos).Trim();
+                    value = line.Substring(Pos, line.IndexOf("}") - Pos).Trim();
+                    if (value.IndexOf(".") > 0)
+                    {
+                        if (decimalSeparator != ".")
+                        {
+                            value = value.Replace('.', ',');
+                        }
+                    }
+                    else if (value.IndexOf(",") > 0)
+                    {
+                        if (decimalSeparator != ",")
+                        {
+                            value = value.Replace(',', '.');
+                        }
+
+                    }
+                    Data.SliceHeight = value;
                     Debug.WriteLine($"[{Data.SliceHeight}]");
                 }
             }
